@@ -1,4 +1,4 @@
-#Golang BankMega Promo Scrapper
+# Golang BankMega Promo Scrapper
 
 ## Install & Run
 How to install and run
