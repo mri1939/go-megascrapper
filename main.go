@@ -235,11 +235,14 @@ func fetchItem(url string) (item, error) {
 	})
 	periode := strings.Join(p, "")
 	gambar, _ := doc.Find(".keteranganinside").Find("img").Attr("src")
+	if gambar != "" {
+		gambar = baseURL + strings.Trim(gambar, "/")
+	}
 	return item{
 		Title:   title,
 		Area:    area,
 		Periode: periode,
-		Gambar:  baseURL + strings.Trim(gambar, "/"),
+		Gambar:  gambar,
 		URL:     url,
 	}, nil
 }
