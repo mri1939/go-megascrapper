@@ -231,7 +231,7 @@ func fetchItem(url string) (item, error) {
 		Title:   title,
 		Area:    area,
 		Periode: periode,
-		Gambar:  baseURL + gambar,
+		Gambar:  baseURL + strings.Trim(gambar, "/"),
 		URL:     url,
 	}, nil
 }
