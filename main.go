@@ -15,12 +15,12 @@ import (
 )
 
 type item struct {
-	Title   string `json:"title"`
-	Area    string `json:"areaPromo"`
-	Periode string `json:"periodePromo"`
-	Gambar  string `json:"imgUrl"`
-	URL     string `json:"urlPromo"`
-	cat     category
+	Title   string   `json:"title"`
+	Area    string   `json:"areaPromo"`
+	Periode string   `json:"periodePromo"`
+	Gambar  string   `json:"imgUrl"`
+	URL     string   `json:"urlPromo"`
+	cat     category // meow
 }
 
 type category struct {
@@ -28,7 +28,7 @@ type category struct {
 }
 
 type itemURL struct {
-	cat category
+	cat category // meow
 	url string
 }
 
@@ -52,8 +52,7 @@ func main() {
 		log.Fatalf("Failed to parse Document : %s", err.Error())
 	}
 
-	// meow
-	cats := getCategories(doc)
+	cats := getCategories(doc) // meow-meow
 	js := getJS(doc)
 
 	for i := range cats {
@@ -61,6 +60,8 @@ func main() {
 	}
 
 	itemurls := make(chan itemURL)
+
+	// Fetch all URL of promo Concurently
 	go func() {
 		for _, c := range cats {
 			fetchItemURL(itemurls, c)
@@ -70,13 +71,15 @@ func main() {
 
 	var wg sync.WaitGroup
 	items := make(chan item)
-
 	wg.Add(*numOfConcurency)
+
+	// Wait concurently for all goroutines to be done
 	go func() {
 		wg.Wait()
 		close(items)
 	}()
 
+	// Create goroutines
 	for i := 0; i < *numOfConcurency; i++ {
 		go func() {
 			defer wg.Done()
@@ -93,6 +96,7 @@ func main() {
 		}()
 	}
 
+	// Create a map and write items from channel
 	res := make(map[string][]item)
 	for i := range items {
 		res[i.cat.title] = append(res[i.cat.title], i)
@@ -100,6 +104,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to write json file : %s", err.Error())
 	}
+
+	// Create json encoder
 	e := json.NewEncoder(os.Stdout)
 	if !*stdoutput {
 		outputFile, err := os.OpenFile(*output, os.O_WRONLY|os.O_CREATE, 0755)
@@ -110,6 +116,8 @@ func main() {
 		e = json.NewEncoder(outputFile)
 	}
 	e.SetIndent("", "    ")
+
+	// Encode result to using encoder
 	if e.Encode(res) != nil {
 		log.Fatalf("failed to write JSON File")
 	}
